@@ -10,7 +10,15 @@ describe Redis::Deque do
     @queue.clear true
   end
 
+  before(:each) do
+    @queue.clear true
+  end
+
   after(:all) do
+    @queue.clear true
+  end
+
+  after(:each) do
     @queue.clear true
   end
 
@@ -28,12 +36,25 @@ describe Redis::Deque do
     @queue.size.should be == 1
   end
 
+  it 'should add an element to the front of the queue' do
+    @queue.unshift 'a'
+    @queue.unshift 'b'
+    @queue.size.should be == 2
+
+    message = @queue.pop(true)
+    message.should be == 'b'
+  end
+
   it 'should return an element from the queue' do
+    @queue << 'a'
     message = @queue.pop(true)
     message.should be == 'a'
   end
 
   it 'should remove the element from bp_queue if commit is called' do
+    @queue << 'a'
+    @queue.pop true
+
     @redis.llen('bp__test').should be == 1
     @queue.commit
     @redis.llen('bp__test').should be == 0
@@ -48,6 +69,16 @@ describe Redis::Deque do
       test << e
     end
     payload.should be == test
+  end
+
+  it 'should implement lifo pattern with unshift' do
+    payload = %w(a b c d e)
+    payload.each { |e| @queue.unshift e }
+    test = []
+    while (e = @queue.pop(true))
+      test << e
+    end
+    test.should be == payload.reverse
   end
 
   it 'should remove all of the elements from the main queue' do
