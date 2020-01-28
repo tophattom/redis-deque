@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'redis-queue'
+require 'redis-deque'
 
 redis = Redis.new
 
-queue = Redis::Queue.new('__test', 'bp__test', redis: redis)
+queue = Redis::Deque.new('__test', redis: redis)
 queue.clear true
 
 100.times { queue << rand(100) }
