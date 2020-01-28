@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class Redis
-  class Queue
+  class Deque
     VERSION = '0.1.0'
 
     def self.version
-      "redis-queue version #{VERSION}"
+      "redis-deque version #{VERSION}"
     end
 
     def initialize(queue_name, process_queue_name, options = {})

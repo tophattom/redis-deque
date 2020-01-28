@@ -3,10 +3,10 @@
 require 'spec_helper'
 require 'timeout'
 
-describe Redis::Queue do
+describe Redis::Deque do
   before(:all) do
     @redis = Redis.new
-    @queue = Redis::Queue.new('__test', 'bp__test')
+    @queue = Redis::Deque.new('__test', 'bp__test')
     @queue.clear true
   end
 
@@ -15,12 +15,12 @@ describe Redis::Queue do
   end
 
   it 'should return correct version string' do
-    Redis::Queue.version.should == "redis-queue version #{Redis::Queue::VERSION}"
+    Redis::Deque.version.should == "redis-deque version #{Redis::Deque::VERSION}"
   end
 
   it 'should create a new redis-queue object' do
-    queue = Redis::Queue.new('__test', 'bp__test')
-    queue.class.should == Redis::Queue
+    queue = Redis::Deque.new('__test', 'bp__test')
+    queue.class.should == Redis::Deque
   end
 
   it 'should add an element to the queue' do
@@ -103,7 +103,7 @@ describe Redis::Queue do
 
   it 'should honor the timeout param in the initializer' do
     redis = Redis.new
-    queue = Redis::Queue.new('__test_tm', 'bp__test_tm', redis: redis, timeout: 2)
+    queue = Redis::Deque.new('__test_tm', 'bp__test_tm', redis: redis, timeout: 2)
     queue.clear true
 
     is_ok = true
