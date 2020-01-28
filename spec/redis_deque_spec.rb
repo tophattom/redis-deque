@@ -6,7 +6,7 @@ require 'timeout'
 describe Redis::Deque do
   before(:all) do
     @redis = Redis.new
-    @queue = Redis::Deque.new('__test', 'bp__test')
+    @queue = Redis::Deque.new('__test', process_queue_name: 'bp__test')
     @queue.clear true
   end
 
@@ -27,8 +27,19 @@ describe Redis::Deque do
   end
 
   it 'should create a new redis-queue object' do
-    queue = Redis::Deque.new('__test', 'bp__test')
+    queue = Redis::Deque.new('__test', process_queue_name: 'bp__test')
     queue.class.should == Redis::Deque
+  end
+
+  it 'should create default process_queue_name if one is not given' do
+    queue = Redis::Deque.new '__test_queue'
+    queue.instance_variable_get(:@process_queue_name).should be == '__test_queue_process'
+  end
+
+  it 'should not allow same name for queue_name and process_queue_name' do
+    expect {
+      Redis::Deque.new '__test_queue', process_queue_name: '__test_queue'
+    }.to raise_error(ArgumentError)
   end
 
   it 'should add an element to the queue' do
@@ -134,7 +145,7 @@ describe Redis::Deque do
 
   it 'should honor the timeout param in the initializer' do
     redis = Redis.new
-    queue = Redis::Deque.new('__test_tm', 'bp__test_tm', redis: redis, timeout: 2)
+    queue = Redis::Deque.new('__test_tm', process_queue_name: 'bp__test_tm', redis: redis, timeout: 2)
     queue.clear true
 
     is_ok = true

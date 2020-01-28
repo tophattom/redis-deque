@@ -8,14 +8,14 @@ class Redis
       "redis-deque version #{VERSION}"
     end
 
-    def initialize(queue_name, process_queue_name, options = {})
-      raise ArgumentError, 'First argument must be a non empty string'  if !queue_name.is_a?(String) || queue_name.empty?
-      raise ArgumentError, 'Second argument must be a non empty string' if !process_queue_name.is_a?(String) || process_queue_name.empty?
-      raise ArgumentError, 'Queue and Process queue have the same name' if process_queue_name == queue_name
+    def initialize(queue_name, options = {})
+      raise ArgumentError, 'queue_name must be a non-empty string'  if !queue_name.is_a?(String) || queue_name.empty?
+      raise ArgumentError, 'process_queue_name must be a non-empty string' if options.key?(:process_queue_name) && (!options[:process_queue_name].is_a?(String) || options[:process_queue_name].empty?)
+      raise ArgumentError, 'queue_name and process_queue_name must be different' if options[:process_queue_name] == queue_name
 
       @redis = options[:redis] || Redis.current
       @queue_name = queue_name
-      @process_queue_name = process_queue_name
+      @process_queue_name = options[:process_queue_name] || "#{queue_name}_process"
       @last_message = nil
       @timeout = options[:timeout] ||= 0
     end
