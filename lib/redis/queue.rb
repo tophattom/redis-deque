@@ -37,6 +37,10 @@ class Redis
       @redis.lpush(@queue_name, obj)
     end
 
+    def unshift(obj)
+      @redis.rpush(@queue_name, obj)
+    end
+
     def pop(non_block = false)
       @last_message = if non_block
                         @redis.rpoplpush(@queue_name, @process_queue_name)
