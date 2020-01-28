@@ -66,7 +66,7 @@ class Redis
 
     def refill
       while (message = @redis.lpop(@process_queue_name))
-        @redis.rpush(@queue_name, message)
+        unshift(message)
       end
       true
     end
