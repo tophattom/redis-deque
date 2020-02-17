@@ -50,8 +50,16 @@ class Redis
       @last_message
     end
 
-    def commit
-      @redis.lrem(@process_queue_name, 0, @last_message)
+    def commit(message)
+      @redis.lrem(@process_queue_name, 0, message)
+    end
+
+    def commit_last
+      commit @last_message
+    end
+
+    def commit_all
+      @redis.del @process_queue_name
     end
 
     def process(non_block = false, timeout = nil)
@@ -59,7 +67,7 @@ class Redis
       loop do
         message = pop(non_block)
         ret = yield message if block_given?
-        commit if ret
+        commit_last if ret
         break if message.nil? || (non_block && empty?)
       end
     end

@@ -62,12 +62,38 @@ describe Redis::Deque do
     message.should be == 'a'
   end
 
-  it 'should remove the element from bp_queue if commit is called' do
+  it 'should remove the last element from bp_queue if commit_last is called' do
     @queue << 'a'
+    @queue << 'b'
+    @queue.pop true
     @queue.pop true
 
+    @redis.llen('bp__test').should be == 2
+    @queue.commit_last
     @redis.llen('bp__test').should be == 1
-    @queue.commit
+    @redis.lpop('bp__test').should be == 'a'
+  end
+
+  it 'should remove specific element from bp_queue if commit is called' do
+    @queue << 'a'
+    @queue << 'b'
+    @queue.pop true
+    @queue.pop true
+
+    @redis.llen('bp__test').should be == 2
+    @queue.commit 'a'
+    @redis.llen('bp__test').should be == 1
+    @redis.lpop('bp__test').should be == 'b'
+  end
+
+  it 'should remove everything from bp_queue if commit_all is called' do
+    @queue << 'a'
+    @queue << 'b'
+    @queue.pop true
+    @queue.pop true
+
+    @redis.llen('bp__test').should be == 2
+    @queue.commit_all
     @redis.llen('bp__test').should be == 0
   end
 
